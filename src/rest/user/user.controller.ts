@@ -1,11 +1,25 @@
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { Roles } from 'src/common/decorator/roles.decorator';
+import { Role } from './enum/roles.enum';
+import { JwtAuthGuard } from 'src/common/guard/jwt.guard';
+import { RoleGuard } from 'src/common/guard/role.guard';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard, RoleGuard)
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
     const data = await this.userService.create(createUserDto);
